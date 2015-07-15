@@ -9,7 +9,13 @@ data OpCreate = OpCreate {
   , adminAddress :: BS.ByteString
 }
   deriving (Show, Eq)
+  
+  
+_isValidNulldata :: ND.Nulldata -> Bool
+_isValidNulldata nd@(ND.Nulldata msg sender)
+		| BS.length msg < 1 = False
+		| otherwise = True
 
-fromNulldata :: ND.Nulldata -> OpCreate
-fromNulldata (ND.Nulldata script address) = OpCreate name address
+fromNulldata :: ND.Nulldata -> Maybe OpCreate
+fromNulldata nd@(ND.Nulldata script address) = if _isValidNulldata nd then Just $ OpCreate name address else Nothing
   where name = BS.drop 1 script

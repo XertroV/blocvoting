@@ -1,3 +1,4 @@
-binary-get
+binary-strict
 base58-bytestring
-network-bitcoin  -- could not net haskoin to install
+haskoin
+hex
