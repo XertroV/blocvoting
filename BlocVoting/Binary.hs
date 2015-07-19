@@ -2,7 +2,6 @@ module BlocVoting.Binary where
 
 import Data.Word (Word32)
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BL
 import Data.Binary.Strict.Get (runGet, getWord32be)
 
 word32ToInt :: Word32 -> Int

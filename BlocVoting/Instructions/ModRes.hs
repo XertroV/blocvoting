@@ -22,7 +22,7 @@ _isValidNulldata nd@(ND.Nulldata msg sender)
     | otherwise = True
 
 fromNulldata :: ND.Nulldata -> Maybe OpModRes
-fromNulldata nd@(ND.Nulldata msg senderAddress) = if _isValidNulldata nd then Just $ OpModRes cats endT resolution url else Nothing
+fromNulldata nd@(ND.Nulldata msg senderAddress) = if _isValidNulldata nd then Just $ OpModRes cats endT resolution url nd else Nothing
   where cats = get1ByteInt $ BS.drop 1 msg
         endT = get4ByteInt (BS.drop 2 msg) 0
         resL = get1ByteInt $ BS.drop 6 msg

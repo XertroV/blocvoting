@@ -1,8 +1,8 @@
 import Data.Hex (unhex)
-import Data.Maybe (mapMaybe)
 import Data.List.Split (splitOn)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as C
+import qualified Data.Map as M
 
 import BlocVoting.Filter
 import BlocVoting.Tally
@@ -29,5 +29,8 @@ main = do
   -- trim 2 from nulldata for OP_RETURN byte, length byte
   let ndOperations = trimFromNulldata 2 . toNulldata . (\(x:xs) -> unhexNulldata x:xs) . splitOn "|"
   let ndList = filterNVB $ map ndOperations $ lines hexlifiedLines
-  print ndList
-  print $ listOfInstructionsToGrandTally ndList
+  -- print ndList
+  -- print $ listOfInstructionsToGrandTally ndList
+  let gt = listOfInstructionsToGrandTally ndList
+  print gt
+  print $ map (\(Tally tres _) -> tres) . M.elems . gtTallies $ gt

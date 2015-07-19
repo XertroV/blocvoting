@@ -22,6 +22,6 @@ _isValidNulldata nd@(ND.Nulldata msg sender)
 	where addrToEmpower = BS.drop 5 msg
 
 fromNulldata :: ND.Nulldata -> Maybe OpEmpower
-fromNulldata nd@(ND.Nulldata msg senderAddress) = if _isValidNulldata nd then Just $ OpEmpower votes addressPretty else Nothing
+fromNulldata nd@(ND.Nulldata msg senderAddress) = if _isValidNulldata nd then Just $ OpEmpower votes addressPretty nd else Nothing
   where votes = get4ByteInt (BS.drop 1 msg) 0
         addressPretty = encodeBase58 $ BS.drop 5 msg
