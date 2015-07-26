@@ -33,4 +33,4 @@ main = do
   -- print $ listOfInstructionsToGrandTally ndList
   let gt = listOfInstructionsToGrandTally ndList
   print gt
-  print $ map (\(Tally tres _) -> tres) . M.elems . gtTallies $ gt
+  mapM_ print $ map (\(Tally tres _) -> tres) . M.elems . gtTallies $ gt
