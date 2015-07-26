@@ -12,3 +12,8 @@ data Resolution = Resolution {
   , rResolved :: Bool
 }
   deriving (Show, Eq)
+
+
+updateResolution :: Resolution -> Integer -> Integer -> Resolution
+updateResolution (Resolution cats endT name url for total resolved) newForVotes newTotalVotes =
+    Resolution cats endT name url (for +  newForVotes) (total + newTotalVotes) resolved

@@ -13,131 +13,79 @@ import qualified BlocVoting.Instructions.ModRes as ModRes
 import qualified BlocVoting.Instructions.Cast as Cast
 import qualified BlocVoting.Instructions.Delegate as Dlg
 
- 
-  
+
+
 getEmpowerment :: GrandTally -> Voter -> Int
 getEmpowerment gt v = case Map.lookup v (gtVoters gt) of Just i -> i
                                                          Nothing -> 0
 
 isVoter :: GrandTally -> Voter -> Bool
 isVoter gt v = Map.member v (gtVoters gt)
+--
+--
+-- data NetworkSettings = NetworkSettings {
+--     adminAddress :: BS.ByteString
+--   , networkName :: BS.ByteString
+-- }
+--   deriving (Show, Eq)
+--
+-- data Tally = Tally {
+--     tResolution :: Resolution
+--   , tVotes :: [Vote]
+-- }
+--   deriving (Show, Eq)
+--
+-- data Resolution = Resolution {
+--     rCategories :: Int
+--   , rEndTimestamp :: Int
+--   , rName :: BS.ByteString
+--   , rUrl :: BS.ByteString
+--   , rVotesFor :: Integer
+--   , rVotesTotal :: Integer
+--   , rResolved :: Bool
+-- }
+--   deriving (Show, Eq)
+--
+-- type Voter = BS.ByteString
+--
+-- data Transfer = Transfer {
+--     fromVoter :: Voter
+--   , afterTime :: Integer
+--   , newAddress :: BS.ByteString
+-- }
+--   deriving (Show, Eq)
+--
+-- data Delegate = Delegate {
+--     delegater :: Voter
+--   , delegate :: Voter
+-- }
+--   deriving (Show, Eq)
+--
+-- data Vote = Vote {
+--     voteScalar :: Int
+--   , voter :: Voter
+--   , height :: Integer
+--   , superseded :: Bool
+-- }
+--   deriving (Show, Eq)
+--
 
-data GrandTally = GrandTally {
-    gtNetworkSettings :: NetworkSettings
-  , gtTallies :: Map.Map BS.ByteString Tally
-  , gtVoters :: Map.Map BS.ByteString Int
-  , gtDelegations :: [Delegate]
-  , gtTransfers :: [Transfer]
-}
-  deriving (Show, Eq)
 
-data NetworkSettings = NetworkSettings {
-    adminAddress :: BS.ByteString
-  , networkName :: BS.ByteString
-}
-  deriving (Show, Eq)
-
-data Tally = Tally {
-    tResolution :: Resolution 
-  , tVotes :: [Vote]
-}
-  deriving (Show, Eq)
-
-data Resolution = Resolution {
-    rCategories :: Int
-  , rEndTimestamp :: Int
-  , rName :: BS.ByteString
-  , rUrl :: BS.ByteString
-  , rVotesFor :: Integer
-  , rVotesTotal :: Integer
-  , rResolved :: Bool
-}
-  deriving (Show, Eq)
-
-type Voter = BS.ByteString
-
-data Transfer = Transfer {
-    fromVoter :: Voter
-  , afterTime :: Integer
-  , newAddress :: BS.ByteString
-}
-  deriving (Show, Eq)
-
-data Delegate = Delegate {
-    delegater :: Voter
-  , delegate :: Voter
-}
-  deriving (Show, Eq)
-
-data Vote = Vote {
-    voteScalar :: Int
-  , voter :: Voter
-  , height :: Integer
-  , superseded :: Bool
-}
-  deriving (Show, Eq)
-  
-  
-  
 getEmpowerment :: GrandTally -> Voter -> Int
 getEmpowerment gt v = case Map.lookup v (gtVoters gt) of Just i -> i
-                                                         Nothing -> 0
+                                                       Nothing -> 0
 
 isVoter :: GrandTally -> Voter -> Bool
 isVoter gt v = Map.member v (gtVoters gt)
+
 
 supersedeIfFrom :: Voter -> Vote -> Vote
 supersedeIfFrom thisVoter vote@(Vote cScalar cSender h _) | thisVoter == cSender = Vote cScalar cSender h True
                                                           | otherwise            = vote
 
-updateResolution :: Resolution -> Integer -> Integer -> Resolution
-updateResolution (Resolution cats endT name url for total resolved) newForVotes newTotalVotes =
-    Resolution cats endT name url (for +  newForVotes) (total + newTotalVotes) resolved
-
 
 isAdminOf :: GrandTally -> BS.ByteString -> Bool
 isAdminOf gt userAddr = userAddr == nsAdminAddress (gtNetworkSettings gt)
-
-
-createGT :: Create.OpCreate -> GrandTally
-createGT (Create.OpCreate cNetName cAdminAddr _) = GrandTally {
-    gtNetworkSettings = NetworkSettings cAdminAddr cNetName
-  , gtTallies = Map.empty
-  , gtVoters = Map.empty
-  , gtDelegations = Map.empty
-  , gtTransfers = []
-}
-
-
-
-modGTVoters :: GrandTally -> Map.Map BS.ByteString Int -> GrandTally
-modGTVoters gt newVoters = GrandTally {
-    gtNetworkSettings = gtNetworkSettings gt
-  , gtTallies = gtTallies gt
-  , gtVoters = newVoters
-  , gtDelegations = gtDelegations gt
-  , gtTransfers = gtTransfers gt
-}
-
-
-
-modGTTallies :: GrandTally -> Map.Map BS.ByteString Tally -> GrandTally
-modGTTallies gt newTallies = GrandTally {
-    gtNetworkSettings = gtNetworkSettings gt
-  , gtTallies = newTallies
-  , gtVoters = gtVoters gt
-  , gtDelegations = gtDelegations gt
-  , gtTransfers = gtTransfers gt
-}
-
-modGTDelegate :: GrandTally -> Map.Map BS.ByteString BS.ByteString -> GrandTally
-modGTDelegate gt newDelegates = GrandTally {
-    gtNetworkSettings = gtNetworkSettings gt
-  , gtTallies = gtTallies gt
-  , gtVoters = gtVoters gt
-  , gtDelegations = newDelegates
-  , gtTransfers = gtTransfers gt
-}
 
 
 applyOpEmpower :: GrandTally -> Maybe Empower.OpEmpower -> GrandTally
@@ -178,6 +126,7 @@ applyOpDelegate :: GrandTally -> Maybe Dlg.OpDelegate -> GrandTally
 applyOpDelegate gt (Just (Dlg.OpDelegate dCats dAddr nd)) = modGTDelegate gt newDelegates
   where newDelegates = Map.insert (ndAddress nd) (encodeBase58 dAddr) (gtDelegations gt)
 applyOpDelegate gt _ = gt
+
 
 modGTCast :: GrandTally -> Maybe Cast.OpCast -> GrandTally
 modGTCast gt (Just (Cast.OpCast cScalar cRes cSender nd)) = GrandTally {

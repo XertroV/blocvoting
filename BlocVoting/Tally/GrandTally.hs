@@ -18,17 +18,45 @@ data GrandTally = GrandTally {
 }
   deriving (Show, Eq)
 
-
 createGT :: Create.OpCreate -> GrandTally
-createGT (Create.OpCreate networkName adminAddress nd) = GrandTally {
-    gtNetworkSettings = NetworkSettings adminAddress networkName
+createGT (Create.OpCreate cNetName cAdminAddr _) = GrandTally {
+    gtNetworkSettings = NetworkSettings cAdminAddr cNetName
   , gtTallies = Map.empty
   , gtVoters = Map.empty
-  , gtDelegations = []
+  , gtDelegations = Map.empty
   , gtTransfers = []
 }
 
 
+
+modGTVoters :: GrandTally -> Map.Map BS.ByteString Int -> GrandTally
+modGTVoters gt newVoters = GrandTally {
+    gtNetworkSettings = gtNetworkSettings gt
+  , gtTallies = gtTallies gt
+  , gtVoters = newVoters
+  , gtDelegations = gtDelegations gt
+  , gtTransfers = gtTransfers gt
+}
+
+
+
+modGTTallies :: GrandTally -> Map.Map BS.ByteString Tally -> GrandTally
+modGTTallies gt newTallies = GrandTally {
+    gtNetworkSettings = gtNetworkSettings gt
+  , gtTallies = newTallies
+  , gtVoters = gtVoters gt
+  , gtDelegations = gtDelegations gt
+  , gtTransfers = gtTransfers gt
+}
+
+modGTDelegate :: GrandTally -> Map.Map BS.ByteString BS.ByteString -> GrandTally
+modGTDelegate gt newDelegates = GrandTally {
+    gtNetworkSettings = gtNetworkSettings gt
+  , gtTallies = gtTallies gt
+  , gtVoters = gtVoters gt
+  , gtDelegations = newDelegates
+  , gtTransfers = gtTransfers gt
+}
 
 modGTEmpower :: GrandTally -> Maybe Empower.OpEmpower -> GrandTally
 modGTEmpower gt (Just (Empower.OpEmpower votes address nd)) = GrandTally {
