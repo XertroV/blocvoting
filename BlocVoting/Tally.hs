@@ -12,93 +12,12 @@ import qualified BlocVoting.Instructions.ModRes as ModRes
 import qualified BlocVoting.Instructions.Cast as Cast
 
 
-type Address = BS.ByteString
-
-data GrandTally = GrandTally {
-    gtNetworkSettings :: NetworkSettings
-  , gtTallies :: Map.Map BS.ByteString Tally
-  , gtVoters :: Map.Map BS.ByteString Int
-  , gtDelegations :: [Delegate]
-  , gtTransfers :: [Transfer]
-}
-  deriving (Show, Eq)
-
-data NetworkSettings = NetworkSettings {
-    adminAddress :: BS.ByteString
-  , networkName :: BS.ByteString
-}
-  deriving (Show, Eq)
-
-data Tally = Tally {
-    tResolution :: Resolution 
-  , tVotes :: [Vote]
-}
-  deriving (Show, Eq)
-
-data Resolution = Resolution {
-    rCategories :: Int
-  , rEndTimestamp :: Int
-  , rName :: BS.ByteString
-  , rUrl :: BS.ByteString
-  , rVotesFor :: Integer
-  , rVotesTotal :: Integer
-  , rResolved :: Bool
-}
-  deriving (Show, Eq)
-
-type Voter = BS.ByteString
-
-data Transfer = Transfer {
-    fromVoter :: Voter
-  , afterTime :: Integer
-  , newAddress :: BS.ByteString
-}
-  deriving (Show, Eq)
-
-data Delegate = Delegate {
-    delegater :: Voter
-  , delegate :: Voter
-}
-  deriving (Show, Eq)
-
-data Vote = Vote {
-    voteScalar :: Int
-  , voter :: Voter
-  , height :: Integer
-  , superseded :: Bool
-}
-  deriving (Show, Eq)
-  
-  
-  
 getEmpowerment :: GrandTally -> Voter -> Int
 getEmpowerment gt v = fromJust $ Map.lookup v (gtVoters gt)
 
 
 isVoter :: GrandTally -> Voter -> Int
 isVoter gt v = Map.member v (gtVoters gt)
-
-
-
-createGT :: Create.OpCreate -> GrandTally
-createGT (Create.OpCreate networkName adminAddress nd) = GrandTally {
-    gtNetworkSettings = NetworkSettings adminAddress networkName
-  , gtTallies = Map.empty
-  , gtVoters = Map.empty
-  , gtDelegations = []
-  , gtTransfers = []
-}
-
-
-modGTEmpower :: GrandTally -> Maybe Empower.OpEmpower -> GrandTally
-modGTEmpower gt (Just (Empower.OpEmpower votes address nd)) = GrandTally {
-    gtNetworkSettings = gtNetworkSettings gt
-  , gtTallies = gtTallies gt
-  , gtVoters = Map.insert address votes (gtVoters gt)
-  , gtDelegations = gtDelegations gt
-  , gtTransfers = gtTransfers gt
-}
-modGTEmpower gt _ = gt
 
 
 modGTModRes :: GrandTally -> Maybe ModRes.OpModRes -> GrandTally
@@ -114,10 +33,6 @@ modGTModRes gt (Just (ModRes.OpModRes cats endTimestamp resolution url nd)) = Gr
         origTally = fromJust $ Map.lookup resolution (gtTallies gt)
         origRes = tResolution origTally
 modGTModRes gt _ = gt
-
-supersedeIfFrom :: Voter -> Vote -> Vote
-supersedeIfFrom voter vote@(Vote cScalar cSender height superseded) | voter == cSender = Vote cScalar cSender height True
-                                                                    | otherwise = vote
 
 
 modGTCast :: GrandTally -> Maybe Cast.OpCast -> GrandTally
