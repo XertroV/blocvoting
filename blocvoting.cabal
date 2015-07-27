@@ -1,0 +1,54 @@
+name:                blocvoting
+version:             0.0.0.1
+synopsis:            BlocVoting is a protocol for voting on a blockchain.
+description:         Please see README.md
+homepage:            http://github.com/xertrov/blocvoting
+license:             MIT
+license-file:        LICENSE
+author:              Max Kaye
+maintainer:          blocvoting@xk.io
+-- copyright:
+category:            Web
+build-type:          Simple
+-- extra-source-files:
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     BlocVoting
+  build-depends:       base >= 4.7 && < 5
+                     , binary-strict==0.4.8.2
+                     , haskoin >= 0.2
+                     , base58-bytestring==0.1.0
+                     , hex==0.1.2
+                     , bytestring
+  default-language:    Haskell2010
+
+executable from-file
+  hs-source-dirs:      src
+  main-is:             FromFile.hs
+  other-modules:       BlocVoting
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , blocvoting
+                     , haskoin
+                     , base58-bytestring
+                     , hex
+                     , split
+                     , binary-strict
+                     , bytestring
+                     , containers
+  default-language:    Haskell2010
+
+-- test-suite new-template-test
+--   type:                exitcode-stdio-1.0
+--   hs-source-dirs:      test
+--   main-is:             Spec.hs
+--   build-depends:       base
+--                      , new-template
+--   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+--   default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/xertrov/blocvoting

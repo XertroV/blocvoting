@@ -13,19 +13,10 @@ data GrandTally = GrandTally {
     gtNetworkSettings :: NetworkSettings
   , gtTallies :: Map.Map BS.ByteString Tally
   , gtVoters :: Map.Map BS.ByteString Int
-  , gtDelegations :: [Delegate]
+  , gtDelegations :: Map.Map BS.ByteString BS.ByteString
   , gtTransfers :: [Transfer]
 }
   deriving (Show, Eq)
-
-createGT :: Create.OpCreate -> GrandTally
-createGT (Create.OpCreate cNetName cAdminAddr _) = GrandTally {
-    gtNetworkSettings = NetworkSettings cAdminAddr cNetName
-  , gtTallies = Map.empty
-  , gtVoters = Map.empty
-  , gtDelegations = Map.empty
-  , gtTransfers = []
-}
 
 
 
@@ -57,13 +48,3 @@ modGTDelegate gt newDelegates = GrandTally {
   , gtDelegations = newDelegates
   , gtTransfers = gtTransfers gt
 }
-
-modGTEmpower :: GrandTally -> Maybe Empower.OpEmpower -> GrandTally
-modGTEmpower gt (Just (Empower.OpEmpower votes address nd)) = GrandTally {
-    gtNetworkSettings = gtNetworkSettings gt
-  , gtTallies = gtTallies gt
-  , gtVoters = Map.insert address votes (gtVoters gt)
-  , gtDelegations = gtDelegations gt
-  , gtTransfers = gtTransfers gt
-}
-modGTEmpower gt _ = gt

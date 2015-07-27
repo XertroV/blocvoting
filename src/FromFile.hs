@@ -1,3 +1,5 @@
+module FromFile where
+
 import Data.Hex (unhex)
 import Data.List.Split (splitOn)
 import qualified Data.ByteString as BS

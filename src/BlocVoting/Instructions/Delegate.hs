@@ -16,14 +16,14 @@ data OpDelegate = OpDelegate {
   deriving (Show, Eq)
 
 _isValidNulldata :: ND.Nulldata -> Bool
-_isValidNulldata nd@(ND.Nulldata msg sender)
+_isValidNulldata nd@(ND.Nulldata msg sender _ _)
   | BS.head msg /= op_DELEGATE = False
   | BS.length msg /= 27 = False
   -- | Address (BS.drop 2 msg)
   | otherwise = True
 
 fromNulldata :: ND.Nulldata -> Maybe OpDelegate
-fromNulldata nd@(ND.Nulldata msg senderAddress)
+fromNulldata nd@(ND.Nulldata msg senderAddress _ _)
     | _isValidNulldata nd = Just $ OpDelegate dCats dAddr nd
     | otherwise = Nothing
   where dCats = get1ByteInt $ BS.drop 1 msg

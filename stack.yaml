@@ -1,0 +1,14 @@
+flags: {}
+packages:
+- '.'
+- https://github.com/haskoin/haskoin/archive/master.tar.gz
+extra-deps:
+- base58-bytestring-0.1.0
+- binary-strict-0.4.8.2
+- haskoin-crypto-0.0.1.1
+- hex-0.1.2
+- leveldb-haskell-0.6.3
+- murmur3-1.0.0
+- pbkdf-1.1.1.1
+- containers-0.5.6.3
+resolver: lts-2.19

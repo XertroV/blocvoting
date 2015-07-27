@@ -15,13 +15,13 @@ data OpEmpower = OpEmpower {
   deriving (Show, Eq)
 
 _isValidNulldata :: ND.Nulldata -> Bool
-_isValidNulldata nd@(ND.Nulldata msg sender)
+_isValidNulldata nd@(ND.Nulldata msg sender _ _)
 	| BS.length msg /= 30 = False
 	| decodeBase58Check (encodeBase58 addrToEmpower) == Nothing = False
 	| otherwise = True
 	where addrToEmpower = BS.drop 5 msg
 
 fromNulldata :: ND.Nulldata -> Maybe OpEmpower
-fromNulldata nd@(ND.Nulldata msg senderAddress) = if _isValidNulldata nd then Just $ OpEmpower votes addressPretty nd else Nothing
+fromNulldata nd@(ND.Nulldata msg senderAddress _ _) = if _isValidNulldata nd then Just $ OpEmpower votes addressPretty nd else Nothing
   where votes = get4ByteInt (BS.drop 1 msg) 0
         addressPretty = encodeBase58 $ BS.drop 5 msg
