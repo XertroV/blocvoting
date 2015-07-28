@@ -1,4 +1,4 @@
-module FromFile where
+module Main where
 
 import Data.Hex (unhex)
 import Data.List.Split (splitOn)
@@ -8,6 +8,8 @@ import qualified Data.Map as M
 
 import BlocVoting.Filter
 import BlocVoting.Tally
+import BlocVoting.Tally.Tally
+import BlocVoting.Tally.GrandTally
 import BlocVoting.Nulldata
 
 
@@ -16,8 +18,8 @@ unhexNulldata s = case unhex s of Just unhexedScript -> unhexedScript
                                   _ -> "un-unhexable"
 
 toNulldata :: [String] -> Nulldata
-toNulldata (script:address:_) = Nulldata (C.pack script) (C.pack address)
-toNulldata (script:_) = Nulldata (C.pack script) $ C.pack ""
+toNulldata (script:address:_) = Nulldata (C.pack script) (C.pack address) 0 0
+toNulldata (script:_) = Nulldata (C.pack script) (C.pack "") 0 0
 toNulldata _ = error "toNulldata invalid input"
 
 
@@ -35,4 +37,4 @@ main = do
   -- print $ listOfInstructionsToGrandTally ndList
   let gt = listOfInstructionsToGrandTally ndList
   print gt
-  mapM_ print $ map (\(Tally tres _) -> tres) . M.elems . gtTallies $ gt
+  mapM_ print $ map tResolution . M.elems . gtTallies $ gt

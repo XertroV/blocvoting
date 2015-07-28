@@ -11,7 +11,6 @@ import BlocVoting.Instructions (op_CAST)
 data OpCast = OpCast {
     castScalar :: Int
   , castResolution :: BS.ByteString
-  , castSender :: BS.ByteString
   , castND :: ND.Nulldata
 }
   deriving (Show, Eq)
@@ -23,6 +22,6 @@ _isValidNulldata nd@(ND.Nulldata msg sender _ _)
 	| otherwise = True
 
 fromNulldata :: ND.Nulldata -> Maybe OpCast
-fromNulldata nd@(ND.Nulldata msg senderAddress _ _) = if _isValidNulldata nd then Just $ OpCast cScalar cRes senderAddress nd else Nothing
+fromNulldata nd@(ND.Nulldata msg _ _ _) = if _isValidNulldata nd then Just $ OpCast cScalar cRes nd else Nothing
   where cScalar = get1ByteInt $ BS.drop 1 msg
         cRes = BS.drop 2 msg

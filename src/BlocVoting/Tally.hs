@@ -140,30 +140,30 @@ createGT (Create.OpCreate cNetName cAdminAddr _) = GrandTally {
   , gtTransfers = []
 }
 
-modGTEmpower :: GrandTally -> Maybe Empower.OpEmpower -> GrandTally
-modGTEmpower gt (Just (Empower.OpEmpower votes address nd)) = GrandTally {
-    gtNetworkSettings = gtNetworkSettings gt
-  , gtTallies = gtTallies gt
-  , gtVoters = Map.insert address votes (gtVoters gt)
-  , gtDelegations = gtDelegations gt
-  , gtTransfers = gtTransfers gt
-}
-modGTEmpower gt _ = gt
+-- modGTEmpower :: GrandTally -> Maybe Empower.OpEmpower -> GrandTally
+-- modGTEmpower gt (Just (Empower.OpEmpower votes address nd)) = GrandTally {
+--     gtNetworkSettings = gtNetworkSettings gt
+--   , gtTallies = gtTallies gt
+--   , gtVoters = Map.insert address votes (gtVoters gt)
+--   , gtDelegations = gtDelegations gt
+--   , gtTransfers = gtTransfers gt
+-- }
+-- modGTEmpower gt _ = gt
 
 
 
-modGTCast :: GrandTally -> Maybe Cast.OpCast -> GrandTally
-modGTCast gt (Just (Cast.OpCast cScalar cRes cSender nd)) = GrandTally {
-    gtNetworkSettings = gtNetworkSettings gt
-  , gtTallies = newTallies
-  , gtVoters = gtVoters gt
-  , gtDelegations = gtDelegations gt
-  , gtTransfers = gtTransfers gt
-} where newTallies | isMember = Map.insert cRes $ Tally () (Vote cScalar cSender 0 False):(map (supersedeIfFrom cSender) relVotes)
-                   | otherwise = gtTallies gt
-        isMember = Map.member cRes (gtTallies gt)
-        relTally@(Tally relRes relVotes) = fromJust $ Map.lookup cRes (gtTallies gt)
-modGTCast gt _ = gt
+-- modGTCast :: GrandTally -> Maybe Cast.OpCast -> GrandTally
+-- modGTCast gt (Just (Cast.OpCast cScalar cRes nd@(Nulldata _ cSender _ _))) = GrandTally {
+--     gtNetworkSettings = gtNetworkSettings gt
+--   , gtTallies = newTallies
+--   , gtVoters = gtVoters gt
+--   , gtDelegations = gtDelegations gt
+--   , gtTransfers = gtTransfers gt
+-- } where newTallies | isMember = Map.insert cRes $ Tally () (Vote cScalar cSender 0 False):(map (supersedeIfFrom cSender) relVotes)
+--                    | otherwise = gtTallies gt
+--         isMember = Map.member cRes (gtTallies gt)
+--         relTally@(Tally relRes relVotes) = fromJust $ Map.lookup cRes (gtTallies gt)
+-- modGTCast gt _ = gt
 
 
 

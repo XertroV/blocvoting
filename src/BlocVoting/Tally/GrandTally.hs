@@ -29,8 +29,6 @@ modGTVoters gt newVoters = GrandTally {
   , gtTransfers = gtTransfers gt
 }
 
-
-
 modGTTallies :: GrandTally -> Map.Map BS.ByteString Tally -> GrandTally
 modGTTallies gt newTallies = GrandTally {
     gtNetworkSettings = gtNetworkSettings gt
