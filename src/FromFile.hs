@@ -32,7 +32,7 @@ main = do
   hexlifiedLines <- getContents
   -- trim 2 from nulldata for OP_RETURN byte, length byte
   let ndOperations = trimFromNulldata 2 . toNulldata . (\(x:xs) -> unhexNulldata x:xs) . splitOn "|"
-  let ndList = filterNVB $ map ndOperations $ lines hexlifiedLines
+  let ndList = filterNVB . map ndOperations . lines $ hexlifiedLines
   -- print ndList
   -- print $ listOfInstructionsToGrandTally ndList
   let gt = listOfInstructionsToGrandTally ndList

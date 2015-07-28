@@ -14,7 +14,7 @@ data GrandTally = GrandTally {
   , gtTallies :: Map.Map BS.ByteString Tally
   , gtVoters :: Map.Map BS.ByteString Int
   , gtDelegations :: Map.Map BS.ByteString BS.ByteString
-  , gtTransfers :: [Transfer]
+  , gtTransfers :: Map.Map Address (Int, Address)
 }
   deriving (Show, Eq)
 

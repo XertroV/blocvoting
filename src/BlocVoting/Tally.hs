@@ -23,63 +23,13 @@ import BlocVoting.Tally.Vote
 import BlocVoting.Tally.Voter
 
 
---
---
--- data NetworkSettings = NetworkSettings {
---     adminAddress :: BS.ByteString
---   , networkName :: BS.ByteString
--- }
---   deriving (Show, Eq)
---
--- data Tally = Tally {
---     tResolution :: Resolution
---   , tVotes :: [Vote]
--- }
---   deriving (Show, Eq)
---
--- data Resolution = Resolution {
---     rCategories :: Int
---   , rEndTimestamp :: Int
---   , rName :: BS.ByteString
---   , rUrl :: BS.ByteString
---   , rVotesFor :: Integer
---   , rVotesTotal :: Integer
---   , rResolved :: Bool
--- }
---   deriving (Show, Eq)
---
--- type Voter = BS.ByteString
---
--- data Transfer = Transfer {
---     fromVoter :: Voter
---   , afterTime :: Integer
---   , newAddress :: BS.ByteString
--- }
---   deriving (Show, Eq)
---
--- data Delegate = Delegate {
---     delegater :: Voter
---   , delegate :: Voter
--- }
---   deriving (Show, Eq)
---
--- data Vote = Vote {
---     voteScalar :: Int
---   , voter :: Voter
---   , height :: Integer
---   , superseded :: Bool
--- }
---   deriving (Show, Eq)
---
-
-
 getEmpowerment :: GrandTally -> Voter -> Int
-getEmpowerment gt v = case Map.lookup v (gtVoters gt) of Just i -> i
-                                                         Nothing -> 0
+getEmpowerment gt v = uj $ Map.lookup v (gtVoters gt)
+  where uj (Just i) = i
+        uj Nothing  = 0
 
 isVoter :: GrandTally -> Voter -> Bool
 isVoter gt v = Map.member v (gtVoters gt)
-
 
 supersedeIfFrom :: Voter -> Vote -> Vote
 supersedeIfFrom thisVoter vote@(Vote cScalar cSender h _) | thisVoter == cSender = Vote cScalar cSender h True
@@ -111,6 +61,7 @@ applyOpModRes gt (Just (ModRes.OpModRes cats endTimestamp resolution url nd))
         origRes = tResolution origTally
 applyOpModRes gt _ = gt
 
+
 applyOpCast :: GrandTally -> Maybe Cast.OpCast -> GrandTally
 applyOpCast gt (Just (Cast.OpCast cScalar cRes nd@(Nulldata _ cSender _ _))) = gt1
   where gt1 = modGTTallies gt newTallies
@@ -124,11 +75,11 @@ applyOpCast gt (Just (Cast.OpCast cScalar cRes nd@(Nulldata _ cSender _ _))) = g
         empowerment = getEmpowerment gt cSender
 applyOpCast gt _ = gt
 
+
 applyOpDelegate :: GrandTally -> Maybe Dlg.OpDelegate -> GrandTally
 applyOpDelegate gt (Just (Dlg.OpDelegate dCats dAddr nd)) = modGTDelegate gt newDelegates
   where newDelegates = Map.insert (ndAddress nd) (encodeBase58 dAddr) (gtDelegations gt)
 applyOpDelegate gt _ = gt
-
 
 
 createGT :: Create.OpCreate -> GrandTally
@@ -139,32 +90,6 @@ createGT (Create.OpCreate cNetName cAdminAddr _) = GrandTally {
   , gtDelegations = Map.empty
   , gtTransfers = []
 }
-
--- modGTEmpower :: GrandTally -> Maybe Empower.OpEmpower -> GrandTally
--- modGTEmpower gt (Just (Empower.OpEmpower votes address nd)) = GrandTally {
---     gtNetworkSettings = gtNetworkSettings gt
---   , gtTallies = gtTallies gt
---   , gtVoters = Map.insert address votes (gtVoters gt)
---   , gtDelegations = gtDelegations gt
---   , gtTransfers = gtTransfers gt
--- }
--- modGTEmpower gt _ = gt
-
-
-
--- modGTCast :: GrandTally -> Maybe Cast.OpCast -> GrandTally
--- modGTCast gt (Just (Cast.OpCast cScalar cRes nd@(Nulldata _ cSender _ _))) = GrandTally {
---     gtNetworkSettings = gtNetworkSettings gt
---   , gtTallies = newTallies
---   , gtVoters = gtVoters gt
---   , gtDelegations = gtDelegations gt
---   , gtTransfers = gtTransfers gt
--- } where newTallies | isMember = Map.insert cRes $ Tally () (Vote cScalar cSender 0 False):(map (supersedeIfFrom cSender) relVotes)
---                    | otherwise = gtTallies gt
---         isMember = Map.member cRes (gtTallies gt)
---         relTally@(Tally relRes relVotes) = fromJust $ Map.lookup cRes (gtTallies gt)
--- modGTCast gt _ = gt
-
 
 
 applyInstruction :: GrandTally -> Nulldata -> GrandTally
