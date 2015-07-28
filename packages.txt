@@ -1,4 +1,0 @@
-binary-strict
-base58-bytestring
-haskoin
-hex
